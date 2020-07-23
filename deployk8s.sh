@@ -145,6 +145,7 @@ if [ $role = 'k8s-master' ]; then
 	helm repo add stable https://kubernetes-charts.storage.googleapis.com/
 	helm repo update
 	#helm install stable/postgresql --generate-name #generate-name is necessary
+	echo "source <(helm completion bash)" >> /home/$user/.bashrc
 	log "helm install over"
 
 	log "create private imagehub"
