@@ -23,7 +23,7 @@
 
 
 
-## 私有仓库
+## docker 私有仓库
 
 地址： 本机IP: 5000
 
@@ -33,7 +33,7 @@
 
 
 
-## 私有仓库Web浏览
+## docker 私有仓库Web浏览
 
 地址：本机IP:8090
 
@@ -47,3 +47,6 @@
 
 
 
+## Helm Hub 仓库
+
+helmhub：本机IP( or localhost):8091

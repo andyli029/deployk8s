@@ -8,6 +8,7 @@ join_master="kubeadm join 192.168.0.3:6443 --token 380vf8.lr9fieh3mrmdk818 --dis
 
 
 private_hub_webui=1 # 0 or 1, set 1 to use the webui, http://${private_hub_ip}:8090, you should install ubuntu-desktop: 1. reboot, 2. apt-get install ubuntu-desktop, 3. reboot
+helm_hub=1 # 0 or 1 #port 8091, http:${private_hub_ip}:8091
 user=ubuntu
 private_hub_user=qingcloud
 private_hub_password=qingcloud1234
@@ -171,6 +172,21 @@ if [ $role = 'k8s-master' ]; then
 		webuiuser=`echo -n "$private_hub_user:$private_hub_password" | base64 `
 		docker run -d  --restart=always -p 8090:8080 --name registry-web --link registry -e REGISTRY_URL=http://${private_hub_ip}:5000/v2 -e REGISTRY_TRUST_ANY_SSL=true -e REGISTRY_BASIC_AUTH="$webuiuser" -e REGISTRY_NAME=private_hub hyper/docker-registry-web
 		log RED "browser: http://${private_hub_ip}:8090"
+	fi
+
+	if [ $helm_hub = '1' ]; then
+		mkdir /root/helmhub
+		chmod 777 /root/helmhub
+		docker run -d  --restart=always -p 8091:8080 --name helm-hub -e DEBUG=true -e STORAGE=local -e STORAGE_LOCAL_ROOTDIR=/charts -v /root/helmhub:/charts chartmuseum/chartmuseum
+		helm repo add localhub http://localhost:8091
+		# helm create zlz
+		# helm package zlz
+		# mkdir package_zlz
+		# cp zlz-* package_zlz/
+		# helm repo index package_zlz --url http:/localhost:8091 #--merge helmhub/index.yaml. merge already exists index.yaml
+		# mv package_zlz/* helmhub/
+		# helm repo update
+		# helm search repo zlz
 	fi
 else
 	docker login -u $private_hub_user -p $private_hub_password ${private_hub_ip}:5000
