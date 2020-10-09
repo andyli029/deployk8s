@@ -50,3 +50,20 @@
 ## Helm Hub 仓库
 
 helmhub：本机IP( or localhost):8091
+
+
+## 仪表板
+
+
+1. 进入webui的步骤
+
+```
+helm get notes -n kube-system dashboard
+```
+
+2. 登录webui的密码
+
+```
+kubectl describe secret -n kube-system dashboard-admin
+```
+

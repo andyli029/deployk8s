@@ -9,6 +9,7 @@ join_master="kubeadm join 192.168.0.3:6443 --token 380vf8.lr9fieh3mrmdk818 --dis
 
 private_hub_webui=1 # 0 or 1, set 1 to use the webui, http://${private_hub_ip}:8090, you should install ubuntu-desktop: 1. reboot, 2. apt-get install ubuntu-desktop, 3. reboot
 helm_hub=1 # 0 or 1 #port 8091, http:${private_hub_ip}:8091
+dashboard=1 # 0 or 1
 user=ubuntu
 private_hub_user=qingcloud
 private_hub_password=qingcloud1234
@@ -187,6 +188,20 @@ if [ $role = 'k8s-master' ]; then
 		# mv package_zlz/* helmhub/
 		# helm repo update
 		# helm search repo zlz
+	fi
+
+	if [ $dashboard = '1' ]; then
+		helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+		helm install -n kube-system dashboard kubernetes-dashboard/kubernetes-dashboard
+		kubectl create serviceaccount -n kube-system dashboard-admin
+		kubectl create clusterrolebinding dashboard-cluster-admin --clusterrole=cluster-admin --serviceaccount=kube-system:dashboard-admin
+
+		echo "--------------------------- dashboard addresses --------------------------------"
+		echo "--------------------------- step 1: enter webui --------------------------------"
+		helm get notes -n kube-system dashboard
+		echo "--------------------------- step 2: login with token ---------------------------"
+		kubectl describe secret -n kube-system dashboard-admin
+		echo "--------------------------- dashboard addresses --------------------------------"
 	fi
 else
 	docker login -u $private_hub_user -p $private_hub_password ${private_hub_ip}:5000
